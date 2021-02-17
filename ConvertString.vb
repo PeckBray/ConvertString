@@ -2,36 +2,81 @@
 'RCET0625
 'Spring 2021
 'Convert String
-'
+'https://github.com/PeckBray/ConvertString
+Option Explicit On
+Option Strict On
 Module ConvertString
-
     Sub Main()
-        Dim userInput1 As String
-        Dim integerReturn As Integer
-        Dim message As String
 
-        userInput1 = Console.ReadLine()
-
-        message = ConvertString(userInput1, integerReturn)
-        Console.WriteLine($"{message}")
+        TestValidateAndConvert()
         Console.Read()
+
     End Sub
 
-    Function ConvertString(input As String, integerInput As Integer)
+
+    Private Function ValidateAndConvert(ByVal convertThisString As String, ByRef toThisInteger As Integer) As String
         Dim message As String
         Try
-            integerInput = CInt(input)
+            toThisInteger = CInt(convertThisString)
         Catch ex As Exception
-            If input = "" Then
-                message = ("There was no input")
+            If convertThisString = "" Then
+                message = ("is empty")
             Else
-                message = ("input must contain a number")
+                message = ("Must contain a number")
             End If
         End Try
 
-        Return (message)
+        Return message$
 
     End Function
+
+    Private Sub TestValidateAndConvert()
+        Dim count As Integer = 0
+        Dim result As Integer = 0
+        Dim pad As Integer = 15
+        Dim report As String = ""
+        Dim temp As String = ""
+        Dim testData = New String(4, 4) {
+            {"5", "2", "17", "8", "42"},
+            {"6.7", "3.14", "5.4", "5.5", "0.125"},
+            {"-21", "-32.1", "-4", "-4.5", "-4.4"},
+            {"", "", "", "", ""},
+            {"True", "False", "lOOlO", "9O2lO", "dog"}}
+        For row = 0 To 4
+            For column = 0 To 4
+                result = 0
+                temp = ValidateAndConvert(testData(row, column), result)
+                report &= ("Trying: " & testData(row, column)).PadRight(pad)
+                If row < 3 Then
+                    If CStr(CInt(testData(row, column))) <> CStr(result) Or temp <> "" Then
+                        report &= " TEST FAIL" & vbNewLine
+                        report &= ("Result is: " & CStr(result)).PadRight(pad) & " : " & temp & vbNewLine
+                        report &= ("Should be: " & CStr(CInt(testData(row, column)))).PadRight(pad) & " : " _
+                        & "<Empty>" & vbNewLine
+                    Else
+                        report &= " TEST PASS" & vbNewLine
+                        count += 1
+                    End If
+                ElseIf temp <> "is empty" And row = 3 Then
+                    report &= " TEST FAIL" & vbNewLine
+                    report &= ("Result is: " & CStr(result)).PadRight(pad) & " : " & temp & vbNewLine
+                    report &= ("Should be: " & CStr(0)).PadRight(pad) & " : " & "is empty" & vbNewLine
+                ElseIf temp <> "Must contain a number" And row > 3 Then
+                    report &= " TEST FAIL" & vbNewLine
+                    report &= ("Result is: " & CStr(result)).PadRight(pad) & " : " & temp & vbNewLine
+                    report &= ("Should be: " & CStr(0)).PadRight(pad) & " : " & "Must contain a number" _
+                    & vbNewLine
+                Else
+                    report &= " TEST PASS" & vbNewLine
+                    count += 1
+                End If
+            Next
+        Next
+        Console.WriteLine(report & "Passed " & CStr(count) & " of 25 tests. Score: " _
+            & CStr((count / 25) * 100) & "%")
+        'MessageBox.Show("Passed " & CStr(count) & " of 25 tests. Score: " _
+        '   & CStr((count / 25) * 100) & "%")
+    End Sub
 
 
 
